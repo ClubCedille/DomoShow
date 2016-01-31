@@ -1,28 +1,23 @@
 #!/bin/bash
-for j in {0..255}
-do
+
+colorSet=(255000000 255064000 255127000 255192000 255255000 192255000 127255000 064255000 000255000 000255064 000255127 000255192 000255255 000192255 000127255 000064255 000000255 064000255 127000255 192000255 255000255 255000192 255000127 255000064)
+len=${#colorSet[@]}
+j=0
+while [[ $j -lt ${len}  ]]; do
+  #statements
+  echo $j
   for i in {0..7}
   do
-    r_pos=$(( ((($i*8)-$i)/8+$j)%255 ))
-    sect=$(( ($r_pos/85)%3 ))
-    pos=$(( ($r_pos/85)*3 ))
 
-    # echo $r_pos
-    echo $sect
-    # echo $pos
-    calculate=$((255 - $pos))
+    j=$(($j+1))
 
-    case $sec in
-      $0 ) echo "$calculate, $pos, 0"
-        ;;
-      $1 ) echo "0, $calculate, $pos"
-        ;;
-      $2 ) echo "$pos, 0, $calculate"
-        ;;
-      # * ) echo "wrong"
-        # ;;
-    esac
+    echo "$i${colorSet[$j]}" > /dev/ttyACM0
 
+    if [[ j -eq $(( ${len} - 1 )) ]]; then
+      j=0
+    fi
+
+    sleep 0.04
 
   done
 done
