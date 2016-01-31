@@ -1,0 +1,23 @@
+sitemap demo label="DomoShow"
+{
+	Frame label="Location: ETS" icon="location"{
+		Text item=Date
+		Text item=Temperature
+		Text item=Humidity
+		Text item=Snow
+		Text item=Rain
+		
+					}
+		
+	Frame label="Maison" icon="house" {
+		Text item=PorteEntree
+		Switch item=Lumiere
+		Text item=Temperature_GF_Living
+		
+		
+				//Group item=PorteEntree
+		
+	}
+
+
+}

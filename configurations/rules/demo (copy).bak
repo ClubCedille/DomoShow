@@ -1,0 +1,127 @@
+import org.openhab.core.library.types.*
+import org.openhab.core.persistence.*
+import org.openhab.model.script.actions.*
+import org.joda.time.*
+import java.util.*
+import org.eclipse.xtext.xbase.lib.*
+import org.openhab.core.items.*
+
+
+var String ArduinoUpdate = ""
+var String sketchName = ""
+
+var int V_TEMP = 0
+var int V_HUM = 1
+var int V_LIGHT = 2
+var int V_DIMMER = 3
+var int V_PRESSURE = 4
+var int V_FORECAST = 5
+var int V_RAIN = 6
+var int V_RAINRATE = 7
+var int V_WIND = 8
+var int V_GUST = 9
+var int V_DIRECTION = 10
+var int V_UV = 11
+var int V_WEIGHT = 12
+var int V_DISTANCE = 13
+var int V_IMPEDANCE = 14
+var int V_ARMED = 15
+var int V_TRIPPED = 16
+var int V_WATT = 17
+var int V_KWH = 18
+var int V_SCENE_ON = 19
+var int V_SCENE_OFF = 20
+var int V_HEATER = 21
+var int V_HEATER_SW = 22
+var int V_LIGHT_LEVEL = 23
+var int V_VAR1 = 24
+var int V_VAR2 = 25
+var int V_VAR3 = 26
+var int V_VAR4 = 27
+var int V_VAR5 = 28
+var int V_UP = 29
+var int V_DOWN = 30
+var int V_STOP = 31
+var int V_IR_SEND = 32
+var int V_IR_RECEIVE = 33
+var int V_FLOW = 34
+var int V_VOLUME = 35
+var int V_LOCK_STATUS = 36
+var int V_DUST_LEVEL = 37
+var int V_VOLTAGE = 38
+var int V_CURRENT = 39
+var int msgPresentation = 0
+var int msgSet = 1
+var int msgReq = 2rame label="MQTT Test" {
+                Text item=TestTemperature
+        }
+var int msgInternal = 3
+var int msgStream = 4
+var int alarmArmor = 1
+
+// Internal Commands
+
+var int I_BATTERY_LEVEL = 0
+var int I_TIME = 1
+var int I_VERSION = 2
+var int I_ID_REQUEST = 3
+var int I_ID_RESPONSE = 4
+var int I_INCLUSION_MODE = 5
+var int I_CONFIG = 6
+var int I_FIND_PARENT = 7
+var int I_FIND_PARENT_RESPONSE = 8
+var int I_LOG_MESSAGE = 9
+var int I_CHILDREN = 10
+var int I_SKETCH_NAME = 11
+var int I_SKETCH_VERSION = 12
+var int I_REBOOT = 13
+var int I_GATEWAY_READY = 14
+
+// Mappings
+var HashMap<String, String> sensorToItemsMap = newLinkedHashMap(
+    "101;0;"            -> "livingHum01",
+    "livingHum01"       -> "101;0;",
+    "101;1;"            -> "livingTemp01",
+    "livingTemp01"      -> "101;1;"
+)
+    
+
+//receiving msg from mysensors gateway
+rule "Arduino sends to Openhab"
+    when
+        Item Arduino received update
+    then
+        var String lineBuffer =  Arduino.state.toString.split("\n")
+        for (String line : lineBuffer) {
+            var String[] message = line.split(";")
+            var Integer nodeId = new Integer(message.get(0))
+            var Integer childId = new Integer(message.get(1))
+            var Integer msgType = new Integer(message.get(2))
+            var Integer ack = new Integer(message.get(3))
+            var Integer subType = new Integer(message.get(4))
+            var String msg = message.get(5)
+            if(msgType == 1 ){
+                if (subType == V_TEMP){
+                    postUpdate(sensorToItemsMap.get( nodeId + ";" + childId + ";"), msg)
+                    println ("Temp item: " + sensorToItemsMap.get( nodeId + ";" + childId + ";") + " temp: " + msg )
+                    }
+                if (subType == V_HUM){
+                    postUpdate(sensorToItemsMap.get( nodeId + ";" + childId + ";"), msg)
+                    println ("Hum item: " + sensorToItemsMap.get( nodeId + ";" + childId + ";") + " hum: " + msg )
+                    }
+                }    
+            // Internal Command
+            if(msgType == 3){
+                if(subType == I_SKETCH_NAME){
+                        println("Sketch name: " + msg )
+                        sketchName=msg
+                    }
+                if(subType == I_SKETCH_VERSION){
+                        println("Sketch version: " + msg )
+                        postUpdate(sensorToItemsMap.get( nodeId + ";" + childId + ";"), sketchName+" " +msg )
+                        sketchName=""
+                    }
+                }
+            }   
+        }
+end

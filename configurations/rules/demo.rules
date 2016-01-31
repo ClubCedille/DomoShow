@@ -1,0 +1,74 @@
+import org.openhab.core.library.types.*
+import org.openhab.core.persistence.*
+import org.openhab.model.script.actions.*
+import java.util.*
+import org.eclipse.xtext.xbase.lib.*
+import org.openhab.core.items.*
+import org.joda.time.*
+
+//receiving msg from mysensors gateway
+rule "Arduino sends to Openhab"
+    when
+        Item Arduino received update
+    then
+   
+    
+    	var String[] serialData = Arduino.state.toString.split(",")
+    	
+    	if(serialData.size() == 2 ){
+    		var flag = serialData.get(0).trim
+    		var data = serialData.get(1).trim   	
+    	
+	        if(flag == "BTN"){  
+	        	logInfo("msg1",flag)        	         
+	        	if(data == "OPEN"){
+	        		postUpdate(PorteEntree, "OPEN")
+	        		sendCommand(Arduino, "0000128000")   
+	        		/*Thread::sleep(3000)    
+	        		sendCommand(Arduino, "1000020000")
+	        		Thread::sleep(3000)    
+	        		sendCommand(Arduino, "2000030000")
+	        		Thread::sleep(3000)    
+	        		sendCommand(Arduino, "3000040000") 
+	        		Thread::sleep(3000)   
+	        		sendCommand(Arduino, "4000050000")  */  
+	        		/*sendCommand(Arduino, "5000060000\n")    
+	        		sendCommand(Arduino, "6000070000\n")    
+	        		sendCommand(Arduino, "7000080000\n") */	        		        	
+	        	} else if (data.equals("CLOSED")) {
+	        		postUpdate(PorteEntree, "CLOSED")
+	        		sendCommand(Arduino, "0128000000")  
+	        		/*Thread::sleep(3000)     
+	        		sendCommand(Arduino, "1020000000")  
+	        		Thread::sleep(3000)  
+	        		sendCommand(Arduino, "2030000000") 
+	        		Thread::sleep(3000)   
+	        		sendCommand(Arduino, "3040000000")
+	        		Thread::sleep(3000)    
+	        		sendCommand(Arduino, "4050000000")    */
+	        		/*sendCommand(Arduino, "5060000000\n")    
+	        		sendCommand(Arduino, "6070000000\n")    
+	        		sendCommand(Arduino, "7080000000\n")    */    	    
+	        	}    
+	        } else if(flag == "TMP"){
+	        		postUpdate(Temperature_GF_Living, data)
+	        }
+    	}
+    	Thread::sleep(10)    
+    	
+        
+end
+
+rule "RelayOn"
+    when
+        Item Lumiere changed from OFF to ON
+    then
+    sendCommand(Arduino,"8")
+end
+
+rule "RelayOff"
+    when
+        Item Lumiere changed from ON to OFF
+    then
+    sendCommand(Arduino,"9")
+end

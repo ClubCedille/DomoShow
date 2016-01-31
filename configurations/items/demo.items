@@ -1,0 +1,25 @@
+String Arduino "Arduino" { serial="/dev/ttyACM0@9600", autoupdate="false" }
+//String PorteEntree "Porte d'entrée [%s]"
+//String Door { serial="/dev/ttyACM0@9600,REGEX(xxx(SOMEDATA_HERE pattern)xxx", autoupdate="false" }
+Contact PorteEntree 	"Porte d'entrée [MAP(en.map):%s]"
+Number Temperature_GF_Living    "Température interne [%.1f °C]" <temperature>   (Temperature, GF_Living)
+
+/* Demo items */
+//DateTime Date            "Date [%1$tA, %1$td.%1$tm.%1$tY]"   <calendar> { ntp="Europe/Berlin:de_DE"
+DateTime Date            "Date et Heure [%1$tA, %1$td.%1$tm.%1$tY]"   <calendar> { ntp="Europe/Berlin:de_DE" }
+Switch DemoSwitch               "Switch"
+Dimmer DimmedLight              "Dimmer [%d %%]"        <slider>
+Color  RGBLight                 "RGB Light"             <slider>
+Rollershutter DemoShutter       "Roller Shutter"
+Dimmer DemoBlinds               "Blinds [%d %%]"        <rollershutter>
+Number Scene_General            "Scene"                 <sofa>
+Number Radio_Station            "Radio"                 <network>
+Dimmer Volume                   "Volume [%.1f %%]"
+Number Temperature_Setpoint     "Temperature [%.1f °C]" <temperature>
+
+Location ETS			        "ETS MTL"				<location>
+Number   Temperature   "Température [%.2f °C]"   <temperature> {weather="locationId=home-OWM, type=temperature, property=current"}	
+Number   Humidity      "Humidité [%d %%]"        <water> {weather="locationId=home-OWM, type=atmosphere, property=humidity"}
+Number   Rain          "Rain [%.2f mm/h]"   <rain> {weather="locationId=home-OWM, type=precipitation, property=rain"}
+Number   Snow          "Snow [%.2f mm/h]"   {weather="locationId=home-OWM, type=precipitation, property=snow"}
+Switch Lumiere			"Lumière"
