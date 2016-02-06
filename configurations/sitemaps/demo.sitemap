@@ -4,8 +4,6 @@ sitemap demo label="DomoShow"
 		Text item=Date
 		Text item=Temperature
 		Text item=Humidity
-		Text item=Snow
-		Text item=Rain
 		
 					}
 		
